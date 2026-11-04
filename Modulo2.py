@@ -1,7 +1,7 @@
-TAM_MEMORIA_USUARIO = 450
+from Modulo1 import TAM_MAX_USUARIO
 #creamos la primera particion de memoria, que es la memoria total disponible para los procesos de usuario
 def crear_memoria():
-    return [{"inicio": 0, "tamanio": TAM_MEMORIA_USUARIO, "libre": True, "id_proc": None}]
+    return [{"inicio": 0, "tamanio": TAM_MAX_USUARIO, "libre": True, "id_proc": None}]
 
 #la funcion que busca la mejor particion libre para un proceso de tamaño 'tam'
 def buscar_mejor_particion(memoria, tam):
