@@ -1,8 +1,8 @@
 """
 INFORME DE ESTADISTICAS FINALES.
 
-Recibe 'cola_terminados' (lista de diccionarios). Cada proceso debe traer
-la clave 'tiempo_fin' (clock en el que terminó, la guarda el Módulo 4).
+Recibe 'cola_terminados' (una lista de diccionarios). Cada proceso debe traer
+la clave 'tiempo_fin' (clock en el que terminó, la guarda el módulo 4).
 
     tiempo_retorno = tiempo_fin - TA
     tiempo_espera  = tiempo_retorno - TI
@@ -40,7 +40,7 @@ def mostrar_informe_final(cola_terminados):
     print("=" * 40)
     print(f"{'Proceso':<10}{'Fin':<8}{'Retorno':<11}{'Espera':<11}")
     print("-" * 40)
-
+  
     for p in sorted(cola_terminados, key=lambda x: x["id"]):
         print(f"{p['id']:<10}{p['tiempo_fin']:<8}{p['tiempo_retorno']:<11}{p['tiempo_espera']:<11}")
 
