@@ -9,7 +9,6 @@ la clave 'tiempo_fin' (clock en el que terminó, la guarda el módulo 4).
     rendimiento    = procesos terminados / tiempo total de la simulación
 """
 
-
 def calcular_estadisticas(cola_terminados):
     """
     Agrega 'tiempo_retorno' y 'tiempo_espera' a cada proceso terminado.
