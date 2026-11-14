@@ -8,7 +8,7 @@ Recibe 'cola_terminados' (lista de diccionarios, la que va llenando el módulo 4
 Cada proceso debe traer:
     "TA":          tiempo de arribo
     "TI":          tiempo de irrupción
-    "tiempo_fin":  clock en el que terminó (lo guarda el Módulo 4. El Módulo 1
+    "tiempo_fin":  clock en el que terminó (lo guarda el módulo 4. El módulo 1
                    lo crea en None)
 
     tiempo_retorno = tiempo_fin - TA
@@ -17,19 +17,16 @@ Cada proceso debe traer:
 
 El tiempo total de la simulación es el 'tiempo_fin' del último proceso en
 terminar (se cuenta desde el clock 0).
-"""
 
-# CAMBIOS sobre el módulo original:
-#  - calcular_estadisticas devuelve también el tiempo total.
-#  - mostrar_informe_final usa tablas con bordes, igual que el resto de las
-#    pantallas, y lista los procesos en el orden en que terminaron (antes se
-#    ordenaba el id como texto y P10 quedaba antes que P2).
-#  - Se quitó print_procesos (código de prueba con variables inexistentes).
+Los tiempos están en segundos (s), igual que el reloj del resto de las pantallas.
+"""
 
 def calcular_estadisticas(cola_terminados):
     """
     Agrega 'tiempo_retorno' y 'tiempo_espera' a cada proceso terminado.
     Devuelve (promedio_retorno, promedio_espera, rendimiento, tiempo_total).
+    El rendimiento es cantidad de procesos / tiempo_total.
+    Requiere que la lista no esté vacía (lo controla mostrar_informe_final).
     """
     for p in cola_terminados:
         p["tiempo_retorno"] = p["tiempo_fin"] - p["TA"]
@@ -44,18 +41,24 @@ def calcular_estadisticas(cola_terminados):
 
 
 def mostrar_informe_final(cola_terminados):
-    """Muestra la tabla por proceso, los promedios y el rendimiento del sistema."""
+    """
+    Imprime el informe: una tabla con el retorno y la espera de cada proceso
+    (en el orden en que terminaron), los promedios, el rendimiento del sistema,
+    la cantidad de procesos finalizados y el tiempo total de simulación.
+    """
     if not cola_terminados:
         print("No hay procesos terminados para mostrar estadísticas.")
         return
 
     promedio_retorno, promedio_espera, rendimiento, tiempo_total = calcular_estadisticas(cola_terminados)
 
+    # Anchos de columna de la tabla
     ancho_id = 4
     ancho_otro = 9
     barra_id = "─" * ancho_id
     barra_otro = "─" * ancho_otro
 
+    # Tabla con bordes, mismo estilo que las pantallas del módulo 7
     print(f"\nInforme estadístico")
 
     print(f"┌─{barra_id}─┬─{barra_otro}─┬─{barra_otro}─┐")
@@ -68,9 +71,9 @@ def mostrar_informe_final(cola_terminados):
     print(f"└─{barra_id}─┴─{barra_otro}─┴─{barra_otro}─┘")
     print()
 
+    # Promedios, rendimiento y totales
     print(f"Tiempo promedio de retorno: {promedio_retorno:.2f} s")
     print(f"Tiempo promedio de espera: {promedio_espera:.2f} s")
     print(f"Rendimiento del sistema: {rendimiento:.2f}")
     print(f"Cantidad de procesos finalizados {len(cola_terminados)}")
     print(f"Tiempo total de simulación {tiempo_total} s")
-
