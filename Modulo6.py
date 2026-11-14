@@ -1,18 +1,29 @@
-"""
-INFORME DE ESTADISTICAS FINALES.
+# Módulo 6: Informe de estadísticas finales.
 
-Recibe 'cola_terminados' (una lista de diccionarios). Cada proceso debe traer
-la clave 'tiempo_fin' (clock en el que terminó, la guarda el módulo 4).
+"""
+Muestra el informe estadístico final de la simulación. Lo llama el módulo 7
+al terminar el último proceso.
+
+Recibe 'cola_terminados' (lista de diccionarios, la que va llenando el módulo 4).
+Cada proceso debe traer:
+    "TA":          tiempo de arribo
+    "TI":          tiempo de irrupción
+    "tiempo_fin":  clock en el que terminó (lo guarda el Módulo 4. El Módulo 1
+                   lo crea en None)
 
     tiempo_retorno = tiempo_fin - TA
     tiempo_espera  = tiempo_retorno - TI
     rendimiento    = procesos terminados / tiempo total de la simulación
+
+El tiempo total de la simulación es el 'tiempo_fin' del último proceso en
+terminar (se cuenta desde el clock 0).
 """
 
 def calcular_estadisticas(cola_terminados):
     """
     Agrega 'tiempo_retorno' y 'tiempo_espera' a cada proceso terminado.
     Devuelve (promedio_retorno, promedio_espera, rendimiento).
+    Requiere que la lista no esté vacía (lo controla mostrar_informe_final).
     """
     for p in cola_terminados:
         p["tiempo_retorno"] = p["tiempo_fin"] - p["TA"]
@@ -27,7 +38,10 @@ def calcular_estadisticas(cola_terminados):
 
 
 def mostrar_informe_final(cola_terminados):
-    """Muestra la tabla por proceso, los promedios y el rendimiento del sistema."""
+    """
+    Imprime la tabla por proceso (ordenada por id), los promedios de retorno y
+    espera, y el rendimiento del sistema. No devuelve nada.
+    """
     if not cola_terminados:
         print("No hay procesos terminados para mostrar estadísticas.")
         return
