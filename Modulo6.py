@@ -19,11 +19,17 @@ El tiempo total de la simulación es el 'tiempo_fin' del último proceso en
 terminar (se cuenta desde el clock 0).
 """
 
+# CAMBIOS sobre el módulo original:
+#  - calcular_estadisticas devuelve también el tiempo total.
+#  - mostrar_informe_final usa tablas con bordes, igual que el resto de las
+#    pantallas, y lista los procesos en el orden en que terminaron (antes se
+#    ordenaba el id como texto y P10 quedaba antes que P2).
+#  - Se quitó print_procesos (código de prueba con variables inexistentes).
+
 def calcular_estadisticas(cola_terminados):
     """
     Agrega 'tiempo_retorno' y 'tiempo_espera' a cada proceso terminado.
-    Devuelve (promedio_retorno, promedio_espera, rendimiento).
-    Requiere que la lista no esté vacía (lo controla mostrar_informe_final).
+    Devuelve (promedio_retorno, promedio_espera, rendimiento, tiempo_total).
     """
     for p in cola_terminados:
         p["tiempo_retorno"] = p["tiempo_fin"] - p["TA"]
@@ -34,30 +40,37 @@ def calcular_estadisticas(cola_terminados):
     promedio_espera = sum(p["tiempo_espera"] for p in cola_terminados) / cantidad
     tiempo_total = max(p["tiempo_fin"] for p in cola_terminados)
 
-    return promedio_retorno, promedio_espera, cantidad / tiempo_total
+    return promedio_retorno, promedio_espera, cantidad / tiempo_total, tiempo_total
 
 
 def mostrar_informe_final(cola_terminados):
-    """
-    Imprime la tabla por proceso (ordenada por id), los promedios de retorno y
-    espera, y el rendimiento del sistema. No devuelve nada.
-    """
+    """Muestra la tabla por proceso, los promedios y el rendimiento del sistema."""
     if not cola_terminados:
         print("No hay procesos terminados para mostrar estadísticas.")
         return
 
-    promedio_retorno, promedio_espera, rendimiento = calcular_estadisticas(cola_terminados)
+    promedio_retorno, promedio_espera, rendimiento, tiempo_total = calcular_estadisticas(cola_terminados)
 
-    print("\n" + "=" * 40)
-    print("INFORME ESTADÍSTICO FINAL")
-    print("=" * 40)
-    print(f"{'Proceso':<10}{'Fin':<8}{'Retorno':<11}{'Espera':<11}")
-    print("-" * 40)
-  
-    for p in sorted(cola_terminados, key=lambda x: x["id"]):
-        print(f"{p['id']:<10}{p['tiempo_fin']:<8}{p['tiempo_retorno']:<11}{p['tiempo_espera']:<11}")
+    ancho_id = 4
+    ancho_otro = 9
+    barra_id = "─" * ancho_id
+    barra_otro = "─" * ancho_otro
 
-    print("-" * 40)
-    print(f"Retorno promedio: {promedio_retorno:.2f}")
-    print(f"Espera promedio:  {promedio_espera:.2f}")
-    print(f"Rendimiento:      {rendimiento:.3f} procesos/unidad de tiempo")
+    print(f"\nInforme estadístico")
+
+    print(f"┌─{barra_id}─┬─{barra_otro}─┬─{barra_otro}─┐")
+    print(f"│ {"ID":<{ancho_id}} │ {"Retorno":<{ancho_otro}} │ {"Espera":<{ancho_otro}} │")
+    print(f"├─{barra_id}─┼─{barra_otro}─┼─{barra_otro}─┤")
+
+    for p in cola_terminados:
+        print(f"│ {"P" + str(p["id"]):<{ancho_id}} │ {p["tiempo_retorno"]:>{ancho_otro}} │ {p["tiempo_espera"]:>{ancho_otro}} │")
+
+    print(f"└─{barra_id}─┴─{barra_otro}─┴─{barra_otro}─┘")
+    print()
+
+    print(f"Tiempo promedio de retorno: {promedio_retorno:.2f} s")
+    print(f"Tiempo promedio de espera: {promedio_espera:.2f} s")
+    print(f"Rendimiento del sistema: {rendimiento:.2f}")
+    print(f"Cantidad de procesos finalizados {len(cola_terminados)}")
+    print(f"Tiempo total de simulación {tiempo_total} s")
+
