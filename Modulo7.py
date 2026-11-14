@@ -345,6 +345,7 @@ def mostrar_colas_resumen(cola):
 
 
 def mostrar_estado_cpu(sistema, evento):
+    print("===========================================================================================================")
     print(f"Reloj = {sistema["reloj"]} s")
 
     print(f"\nEvento")
@@ -378,6 +379,7 @@ def mostrar_estado_cpu(sistema, evento):
 
     print(f"    Nuevos      = ", end="")
     mostrar_colas_resumen(sistema["nuevos"])
+
 
 
 def libre_anterior(memoria, i):
