@@ -1,6 +1,4 @@
-"""
-Planificador SRTF para la asignación de CPU
-"""
+# Módulo 3: Planificador SRTF para la asignación de CPU.
 
 def srtf_seleccionar_proceso(proceso_en_ejecucion, cola_listos):
     """

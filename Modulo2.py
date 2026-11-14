@@ -1,7 +1,19 @@
-TAM_MEMORIA_USUARIO = 450
-#creamos la primera particion de memoria, que es la memoria total disponible para los procesos de usuario
+# Módulo 2: Asignación de memoria, best-fit.
+
+# CAMBIOS sobre el módulo original (integración al simulador):
+#  - TAM_MEMORIA_USUARIO pasó a constantes.py.
+#  - crear_memoria agrega primero la partición del SO (100K, ocupada), así las
+#    direcciones de usuario empiezan en 100 como en la salida.
+#  - buscar_mejor_particion y asignar_best_fit quedan sin cambios.
+
+from constantes import TAM_MEMORIA_SO, TAM_MEMORIA_USUARIO
+
+#creamos las particiones iniciales: el SO (ocupada) y la memoria total disponible para los procesos de usuario
 def crear_memoria():
-    return [{"inicio": 0, "tamanio": TAM_MEMORIA_USUARIO, "libre": True, "id_proc": None}]
+    return [
+        {"inicio": 0, "tamanio": TAM_MEMORIA_SO, "libre": False, "id_proc": "SO"},
+        {"inicio": TAM_MEMORIA_SO, "tamanio": TAM_MEMORIA_USUARIO, "libre": True, "id_proc": None},
+    ]
 
 #la funcion que busca la mejor particion libre para un proceso de tamaño 'tam'
 def buscar_mejor_particion(memoria, tam):
