@@ -2,28 +2,13 @@
 
 """
 Formato esperado del archivo (.txt o .csv), separado por comas:
-    #id, TA, TI, TAM
-    1, 0, 5, 150
-    2, 0, 6, 15
+    #id, TA, TI, TAM             #id, TA, TI, TAM
+    1, 0, 5, 150         O        P1, 0, 5, 150
+    2, 0, 6, 15                   P2, 0, 6, 15
 
-- Las líneas vacías y las que empiezan con '#' se ignoran.
 - Cada proceso válido se guarda como diccionario:
     {"id": int, "TA": int, "TI": int, "TAM": int}
 """
-
-# CAMBIOS sobre el módulo original (integración al simulador):
-#  - Las constantes (EXTENSIONES_VALIDAS, MAX_PROCESOS, TAM_MAX_USUARIO) pasaron
-#    a constantes.py para compartirlas con el resto. TAM_MAX_USUARIO ahora es
-#    TAM_MEMORIA_USUARIO (mismo valor, 450K).
-#  - validar_linea: mensajes más cortos (entran en la tabla de análisis), se
-#    agrega el máximo de 3 dígitos por campo y el control de id negativo.
-#  - leer_archivo: abre con utf-8-sig (tildes y BOM de Windows), respeta
-#    MAX_LINEAS_ARCHIVO y devuelve una fila por línea para la tabla de análisis,
-#    además de los procesos. El id puede escribirse con o sin P (P1 o 1).
-#  - Cada proceso se crea ya con tiempo_rest, tiempo_fin y estado.
-#  - admitir_nuevos mueve el mismo diccionario (no crea una copia) para que la
-#    tabla de procesos vea los cambios de estado.
-#  - Se quitó el bloque de prueba aislada del final.
 
 import os
 
@@ -37,9 +22,10 @@ from constantes import (
     TAM_MEMORIA_USUARIO,
 )
 
-"""Chequea extensión y existencia."
-   Devuelve (bool, mensaje). """
+
 def validar_extension(ruta):
+    """Chequea extensión y existencia.   
+    Devuelve (bool, mensaje). """
     extensiones = tuple(e[1:] for e in EXTENSIONES_VALIDAS)
     if not str(ruta).lower().endswith(extensiones):
         return False, "El archivo debe tener extensión .txt o .csv"
@@ -48,17 +34,22 @@ def validar_extension(ruta):
     return True, ""
 
 
-"""Dice si un campo es un número entero (permite el signo menos)."""
+
 def es_entero(campo):
+    """Verifica que el campo es un número entero (permite el signo menos)."""
     digitos = campo[1:] if campo.startswith("-") else campo
     return digitos.isdecimal()
 
 
-"""Valida los campos de una línea ya separada.
-    
-    Devuelve (bool, mensaje_error). """
-def validar_linea(campos, ids_vistos):
 
+def validar_linea(campos, ids_vistos):
+    """Valida los campos de una línea ya separada.   
+
+    Controla, en orden: cantidad de campos, campos vacíos, que sean
+    numéricos, máximo 3 dígitos, id no negativo ni repetido, TA >= 0,
+    TI > 0 y TAM entre 1 y TAM_MEMORIA_USUARIO.
+
+    Devuelve (bool, mensaje). """
     if len(campos) != CAMPOS_ARCHIVO:
         return False, "Cantidad de campos incorrecta"
     if any(campo == "" for campo in campos):
@@ -83,14 +74,15 @@ def validar_linea(campos, ids_vistos):
 
     return True, ""
 
-"""
-    Lee el archivo y devuelve (procesos_validos, lineas, se_excedio).
-    (lineas) es una lista con una fila por línea leída: número de línea,
-    contenido y motivo ("Correcto" o la causa del rechazo).
-    (se_excedio) es True si el archivo tenía más de MAX_LINEAS_ARCHIVO líneas.
-    """
+
 def leer_archivo(ruta):
-    
+    """
+    Lee el archivo línea por línea y arma la lista de procesos válidos.
+
+    Se ignoran los comentarios (#) y las líneas vacías. Se leen como máximo
+    MAX_LINEAS_ARCHIVO líneas y se aceptan como máximo MAX_PROCESOS procesos
+    válidos (los siguientes quedan rechazados por el límite).
+    """
     procesos = []
     lineas = []
     ids_vistos = set()
@@ -132,7 +124,7 @@ def leer_archivo(ruta):
                     "id": id_proc,
                     "TA": ta,
                     "TI": ti,
-                    "TAM": tam,
+                    "TAM": tam,             #Cada proceso se crea ya con tiempo_rest, tiempo_fin y estado. Para tener mejor contol de los procesos.
                     "tiempo_rest": ti,
                     "tiempo_fin": None,
                     "estado": ESTADO_PENDIENTE,
@@ -142,8 +134,9 @@ def leer_archivo(ruta):
 
     return procesos, lineas, se_excedio
 
-"""Ordena por TA (menor a mayor)."""
+
 def obtener_ta(proc):
+    """Ordena por TA (menor a mayor)."""
     return proc["TA"]
 
 def ordenar_procesos(procesos):
@@ -152,7 +145,6 @@ def ordenar_procesos(procesos):
 
 def cargar_procesos(ruta):
     """
-    Función principal del módulo.
     Devuelve (procesos, lineas, se_excedio, error):
       - (procesos) es una lista ordenada por TA, con máximo MAX_PROCESOS elementos
       - (lineas) es el análisis línea por línea del archivo
