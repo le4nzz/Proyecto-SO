@@ -28,7 +28,7 @@ Trabajo Práctico Integrador (TPI) de **Sistemas Operativos**: diseño del diagr
 | Repositorio en GitHub | ✅ Hecho |
 | Definición del lenguaje | ✅ Hecho |
 | División de partes | ✅ Hecho |
-| Código del simulador | ⏳ En curso |
+| Código del simulador | ✅ Hecho | "Espero que le guste profe :) "
 
 ## Reuniones
 
