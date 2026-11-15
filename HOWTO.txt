@@ -1,0 +1,154 @@
+==============================================================================
+- Simulador de Asignacion de Memoria y Planificacion de Procesos
+ TPI Sistemas Operativos - UTN Facultad Regional Resistencia
+==============================================================================
+
+Integrantes:
+  - Bentolila, David Benjamin
+  - Cavallero, Tomas
+  - Gallardo Coronel, Gonzalo
+  - Gomez, Ezequiel
+  - Gonzalez, Leandro Agustin
+  - Romero, Ivan Ezequiel
+  - Sotelo, Felix Edgardo
+
+1. CONTENIDO DEL PAQUETE
+------------------------------------------------------------------------------
+  main.exe          Programa ejecutable (Windows)
+  main.py           Punto de entrada del codigo fuente
+  Modulo1.py        Validacion, carga y orden de procesos
+  Modulo2.py        Asignacion de memoria (Best-Fit)
+  Modulo3.py        Planificador SRTF
+  Modulo4.py        Fin de proceso, liberacion y fusion de particiones
+  Modulo5.py        Admision de Nuevos y Suspendidos
+  Modulo6.py        Informe estadistico final
+  Modulo7.py        Menu y bucle principal del simulador
+  constantes.py     Constantes y estados compartidos
+  lote1.csv ...     Archivos de procesos de ejemplo (.csv y .txt)
+
+IMPORTANTE: los archivos de procesos (.csv o .txt) deben estar en la MISMA
+carpeta que main.exe (o que main.py). El programa solo busca ahi.
+
+2. COMO EJECUTARLO
+------------------------------------------------------------------------------
+Opcion A - Con el ejecutable (no requiere instalar Python):
+  1. Abrir la carpeta del paquete.
+  2. Hacer doble clic en main.exe, o abrir CMD / PowerShell en la carpeta
+     y escribir:   main.exe
+
+Opcion B - Con el codigo fuente:
+  1. Instalar Python 3.12 o superior (https://www.python.org).
+  2. Abrir una terminal (CMD, PowerShell) EN la carpeta del proyecto.
+  3. Escribir:   python main.py
+
+Nota: el simulador usa la terminal para mostrar menus y pedir datos. Debe
+ejecutarse desde una consola real (CMD, PowerShell o terminal de VS Code),
+no desde el panel "Output" de un editor ni desde IDLE, porque ahi no se
+limpia la pantalla correctamente.
+
+
+3. FORMATO DEL ARCHIVO DE PROCESOS
+------------------------------------------------------------------------------
+Archivo de texto (.txt o .csv), una linea por proceso, campos separados
+por comas, en este orden:
+
+    #ID, TA, TI, TAM
+    P1, 0, 5, 150
+    P2, 0, 6, 15
+    3, 1, 10, 10
+
+  ID   Identificador del proceso. Puede escribirse con P (P1) o sin ella (1).
+  TA   Tiempo de arribo (instante en que llega al sistema). Entero >= 0.
+  TI   Tiempo de irrupcion (tiempo de CPU que necesita). Entero > 0.
+  TAM  Tamano del proceso en K. Entero entre 1 y 450.
+
+Reglas:
+  - Las lineas vacias y las que empiezan con # se ignoran.
+  - Ningun campo puede estar vacio ni tener letras (salvo la P del ID).
+  - Cada campo admite como maximo 3 digitos.
+  - No puede haber IDs repetidos.
+  - Se leen hasta 100 lineas del archivo.
+  - Se cargan como maximo 10 procesos validos; los siguientes se rechazan.
+  - Las lineas invalidas no frenan la carga: se descartan y se muestra el
+    motivo en la tabla de analisis del archivo.
+
+
+4. USO DEL MENU
+------------------------------------------------------------------------------
+Al iniciar aparece el menu principal:
+
+    SIMULADOR v2
+
+    Archivo seleccionado: (vacio)
+
+    [1] Iniciar simulador
+    [2] Elegir archivo
+    [3] Formato del archivo
+
+    [4] Salir
+
+Se escribe el numero de la opcion y se presiona Enter.
+
+  [2] Elegir archivo
+      Lista los .txt y .csv de la carpeta. Se escribe el numero del archivo
+      deseado y se muestra su contenido. Con 0 se vuelve al menu sin cambiar.
+
+  [3] Formato del archivo
+      Muestra en pantalla el formato esperado.
+
+  [1] Iniciar simulador
+      Carga el archivo elegido, muestra el analisis linea por linea (cuales
+      lineas son correctas y por que se rechazaron las otras) y comienza la
+      simulacion. Hay que elegir un archivo antes (opcion 2).
+
+  [4] Salir
+      Cierra el programa.
+
+
+5. DURANTE LA SIMULACION
+------------------------------------------------------------------------------
+La simulacion NO corre de forma ininterrumpida. Se detiene y muestra una
+pantalla cada vez que:
+  - llega un proceso nuevo al sistema, o
+  - termina el proceso que estaba en ejecucion.
+
+Cada pantalla se limpia y muestra:
+  - El estado del procesador (proceso en ejecucion en ese instante).
+  - La tabla de particiones de memoria (id de particion, direccion de
+    comienzo, tamano, proceso asignado y fragmentacion interna).
+  - El estado de las colas de Listos y de Listos/Suspendidos.
+
+Se presiona Enter para avanzar hasta el siguiente suceso.
+
+
+6. INFORME FINAL
+------------------------------------------------------------------------------
+Al terminar el ultimo proceso se muestra el informe estadistico:
+  - Tiempo de retorno y tiempo de espera de cada proceso.
+  - Tiempos promedio de retorno y de espera.
+  - Rendimiento del sistema (procesos terminados por unidad de tiempo).
+  - Cantidad de procesos finalizados y tiempo total de simulacion.
+
+Formulas:
+  tiempo de retorno = instante de finalizacion - TA
+  tiempo de espera  = tiempo de retorno - TI
+  rendimiento       = procesos terminados / tiempo total
+
+Con Enter se vuelve al menu principal, donde se puede elegir otro archivo
+y simular de nuevo.
+
+
+8. SOLUCION DE PROBLEMAS
+------------------------------------------------------------------------------
+  "No hay archivos .txt o .csv en la carpeta del programa"
+      Copiar los archivos de procesos a la misma carpeta que main.exe.
+
+  Error "lost sys.stdin" al abrir el .exe
+      El ejecutable se compilo sin consola. Recompilar con --console.
+
+  La pantalla no se limpia y las salidas se acumulan
+      Ejecutar desde CMD, PowerShell o la terminal de VS Code.
+
+  Error de sintaxis al ejecutar con "python main.py"
+      Verificar que la version de Python sea 3.12 o superior
+      (python --version).
