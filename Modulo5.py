@@ -1,14 +1,5 @@
 # Módulo 5: Admisión y Reubicación por Best-Fit (Suspendidos y Nuevos)
 
-# CAMBIOS sobre el módulo original:
-#  - Se agrega el límite de MAX_PROCESOS_ACTIVOS (Ejecución + Listos +
-#    Suspendidos). Solo frena a los Nuevos: un Suspendido ya cuenta como activo.
-#  - Ya no imprime (limpiar_pantalla lo borraría). En su lugar devuelve una
-#    lista de (proceso, destino) con lo que pasó con cada proceso.
-#  - Recibe 'en_cpu' (en lugar de 'clock') para poder contar los activos.
-#  - Usa las constantes de estado (antes "listo" / "suspendido" en minúscula).
-#  - Se agrega contar_procesos_activos.
-
 from constantes import ESTADO_LISTO, ESTADO_SUSPENDIDO, MAX_PROCESOS_ACTIVOS
 from Modulo2 import asignar_best_fit
 
