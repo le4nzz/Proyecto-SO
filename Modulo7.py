@@ -34,18 +34,26 @@ from constantes import (
 
 
 def limpiar_pantalla():
+    """Borra la consola ("cls" en Windows, "clear" en otros sistemas)."""
     os.system("cls" if os.name == "nt" else "clear")
 
 
 def esperar_enter(mensaje="\nEnter para continuar "):
+    """Pausa el programa hasta que el usuario presiona Enter."""
     input(mensaje)
 
 
 def hay_archivos_validos():
+    """Dice si hay al menos un archivo de procesos utilizable en la carpeta."""
     return bool(buscar_archivos_validos())
 
 
 def buscar_archivos_validos():
+    """Busca los archivos de procesos que hay en la carpeta del programa.
+
+    Toma los archivos que coinciden con EXTENSIONES_VALIDAS (*.txt y *.csv) dentro
+    de CARPETA_PROCESOS, y descarta los que están vacíos."""
+
     archivos = []
     for patron in EXTENSIONES_VALIDAS:
         for archivo in CARPETA_PROCESOS.glob(patron):
@@ -55,6 +63,8 @@ def buscar_archivos_validos():
 
 
 def mostrar_archivos_disponibles(archivos, archivo_elegido):
+    """Muestra la lista de archivos disponibles en la carpeta del programa."""
+
     print("Archivos disponibles (carpeta del programa)\n")
     for i, nombre in enumerate(archivos, start=1):
         print(f"[{i}] {nombre} {'(seleccionado)' if archivo_elegido == nombre else ''}")
@@ -62,6 +72,9 @@ def mostrar_archivos_disponibles(archivos, archivo_elegido):
 
 
 def elegir_archivo(archivo_elegido):
+    """Permite al usuario elegir un archivo de procesos, tambien permite ver su contenido.
+    Para confirmar la elección, el usuario debe presionar 's' o Enter. Devuelve el nombre del archivo elegido, o None si se cancela.
+    """
     archivos = buscar_archivos_validos()
     while True:
         limpiar_pantalla()
@@ -97,6 +110,7 @@ def elegir_archivo(archivo_elegido):
 
 
 def ejecutar_menu():
+    """Muestra el menú principal y permite al usuario elegir un archivo y ejecutar el simulador."""
     archivo_elegido = None
 
     while True:
@@ -143,6 +157,7 @@ def ejecutar_menu():
 
 
 def crear_sistema(procesos):
+    """Crea y devuelve la estructura del sistema con los procesos inicializados."""
     return {
         "reloj": 0,
         "procesos": procesos,
@@ -157,22 +172,28 @@ def crear_sistema(procesos):
 
 
 def hay_procesos_validos(sistema):
+    """Dice si hay al menos un proceso válido en el sistema."""
     return bool(sistema["procesos"])
 
 
 def hay_procesos_por_atender(sistema):
+    """Dice si hay procesos que aún no han terminado."""
     return len(sistema["terminados"]) != len(sistema["procesos"])
 
 
 def proceso_llego(sistema):
+    """Dice si hay procesos que han llegado al tiempo actual del reloj."""
     return bool(sistema["pendientes"]) and sistema["pendientes"][0]["TA"] <= sistema["reloj"]
 
 
 def registrar_llegada(sistema):
+    """Mueve los procesos que han llegado del estado pendiente al estado nuevo."""
     admitir_nuevos(sistema["pendientes"], sistema["nuevos"], sistema["reloj"])
 
 
 def admitir_procesos(sistema):
+    """Admite procesos al sistema. Intenta paras los procesos suspendido y nuevos a la memoria 
+    con la politica Best-Fit"""
     return admision_suspendidos_y_nuevos_best_fit(
         sistema["suspendidos"],
         sistema["nuevos"],
@@ -183,6 +204,7 @@ def admitir_procesos(sistema):
 
 
 def planificar_cpu(sistema):
+    """Selecciona el proceso a ejecutar en la CPU según la política SRTF."""
     nuevo, desplazado = srtf_seleccionar_proceso(sistema["en_cpu"], sistema["listos"])
     if nuevo is not None:
         nuevo["estado"] = ESTADO_EJECUCION
@@ -192,6 +214,7 @@ def planificar_cpu(sistema):
 
 
 def ejecutar_simulador(archivo_elegido):
+    """Ejecuta el simulador con el archivo de procesos elegido."""
     procesos, lineas_analizadas, se_excedio, error = cargar_procesos(CARPETA_PROCESOS / archivo_elegido)
 
     limpiar_pantalla()
@@ -245,6 +268,7 @@ def ejecutar_simulador(archivo_elegido):
 
 
 def mostrar_formato_archivo():
+    """Muestra en pantalla el formato esperado del archivo de procesos y las reglas de validación."""
     limpiar_pantalla()
 
     print(textwrap.dedent(
@@ -259,7 +283,8 @@ def mostrar_formato_archivo():
         ...
 
     - TA = tiempo de arribo | TI = tiempo de irrupción | TAM = tamaño
-    - Un proceso por línea, {CAMPOS_ARCHIVO} campos separados por comas, en el orden ID, TA, TI, TAM. El ID puede llevar la P (P1) o no (1). Se ignoran las líneas vacías y las que empiezan con #.
+    - Un proceso por línea, {CAMPOS_ARCHIVO} campos separados por comas, en el orden ID, TA, TI, TAM. El ID puede llevar la P (P1) o no (1). Se ignoran 
+    las líneas vacías y las que empiezan con #.
     - Valores válidos: enteros no negativos. TI y TAM deben ser mayores a 0. TAM máximo: {TAM_MEMORIA_USUARIO}K.
     - Sin IDs repetidos, máximo {MAX_PROCESOS} procesos.
     - Se leen como máximo {MAX_LINEAS_ARCHIVO} líneas."""))
@@ -268,6 +293,7 @@ def mostrar_formato_archivo():
 
 
 def mostrar_lineas_archivo(lineas_analizadas):
+    """Muestra en pantalla el análisis de las líneas del archivo de procesos."""
     ancho_linea = 5
     ancho_contenido = 50
     ancho_motivo = 40
@@ -291,6 +317,7 @@ def mostrar_lineas_archivo(lineas_analizadas):
 
 
 def mostrar_procesos_validos(sistema):
+    """Muestra en pantalla la tabla de procesos válidos que se van a simular."""
     ancho_id = 4
     ancho_tiempo = 7
     ancho_tamanio = 7
@@ -313,10 +340,12 @@ def mostrar_procesos_validos(sistema):
 
 
 def nombre_proceso(p):
+    """Devuelve el nombre del proceso para mostrar en pantalla."""
     return f"P{p['id']}"
 
 
 def nombre_particion(particion):
+    """Devuelve el nombre de la partición para mostrar en pantalla."""
     if particion["libre"]:
         return ""
     if particion["id_proc"] == "SO":
@@ -325,17 +354,20 @@ def nombre_particion(particion):
 
 
 def particion_proceso(sistema, p):
+    """Devuelve el número de la partición en la que se encuentra el proceso."""
     for i, particion in enumerate(sistema["memoria"], start=1):
         if not particion["libre"] and particion["id_proc"] == p["id"]:
             return i
 
 
 def estado_proceso(sistema, p):
+    """Devuelve el estado del proceso para mostrar en pantalla."""
     # Los pendientes se muestran con el estado en blanco, como en la versión original.
     return "" if p["estado"] == ESTADO_PENDIENTE else p["estado"]
 
 
 def mostrar_colas_resumen(cola):
+    """Muestra en pantalla un resumen de los procesos en la cola, con su tiempo restante."""
     if not bool(cola):
         print("")
     else:
@@ -345,6 +377,7 @@ def mostrar_colas_resumen(cola):
 
 
 def mostrar_estado_cpu(sistema, evento):
+    """Muestra en pantalla el estado de la CPU y las colas de procesos, según el evento que ocurrió."""
     print("===========================================================================================================")
     print(f"Reloj = {sistema["reloj"]} s")
 
@@ -383,10 +416,12 @@ def mostrar_estado_cpu(sistema, evento):
 
 
 def libre_anterior(memoria, i):
+    """Devuelve True si la partición anterior a la i-ésima está libre, False en caso contrario."""
     return i != 0 and memoria[i - 1]["libre"]
 
 
 def dibujar_barra_particiones(sistema):
+    """Dibuja en pantalla la barra de particiones de memoria, con el nombre del proceso y el tamaño de cada partición."""
     memoria = sistema["memoria"]
     kb = 5
     print("\nParticiones")
@@ -426,6 +461,7 @@ def dibujar_barra_particiones(sistema):
 
 
 def mostrar_tabla_particiones(sistema):
+    """Muestra en pantalla la tabla de particiones de memoria, con el nombre del proceso y el tamaño de cada partición."""
     ancho_id = 4
     ancho_proceso = 7
     ancho_otro = 7
@@ -447,10 +483,12 @@ def mostrar_tabla_particiones(sistema):
 
 
 def contar_pendientes(sistema):
+    """Cuenta cuántos procesos pendientes hay en el sistema."""
     return sum(estado_proceso(sistema, p) == "" for p in sistema["procesos"])
 
 
 def mostrar_colas(sistema):
+    """Muestra en pantalla la tabla de procesos con su estado, tiempo de arribo, tiempo de irrupción, tamaño, tiempo restante y tiempo de finalización."""
     ancho_id = 4
     ancho_estado = 10
     ancho_restante = 8
@@ -494,7 +532,8 @@ def mostrar_colas(sistema):
 
 
 def mostrar_evento_y_esperar(sistema, se_mostro, evento):
-    limpiar_pantalla()
+    """Muestra en pantalla el estado del sistema tras un evento (llegada o finalización de proceso) y espera a que el usuario presione Enter."""
+    #limpiar_pantalla()
 
     mostrar_estado_cpu(sistema, evento)
     dibujar_barra_particiones(sistema)
